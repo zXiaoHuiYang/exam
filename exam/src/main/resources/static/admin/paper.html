@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>试卷管理</title>
+    <script src="../layui/layui.js"></script>
+    <script src="../js/jquery.js"></script>
+    <link rel="stylesheet" href="../layui/css/layui.css" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <script>
+        $(function () {
+            $.get('../adminInfo',function(data){
+                if(data == '0'){
+                    alert("请先登录！")
+                    top.location.href='./login.html'
+                }
+            },"json")
+        })
+    </script>
+</head>
+<body>
+<div style="margin-right: 15px">
+    <!-- 内容主体区域 -->
+    <div>
+        当前位置：
+        <span class="layui-breadcrumb" lay-separator=" > " style="visibility: visible;">
+            <a href="shouye.html">首页 > </a>
+            <a><cite>试卷管理</cite></a>
+        </span>
+    </div>
+    <div>
+        <div style="float: right;margin-bottom: 10px">
+            <button class="layui-btn layui-btn-warm" onclick='insToggle()'>新增</button>
+        </div>
+        <div style="clear:both;">
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+        </div>
+    </div>
+
+</div>
+<!--新增试卷-->
+<div style='display:none;width:460px;height:163px;z-index:1000;position: fixed;top: 50%;left: 50%;background-color: #fff;
+    box-shadow: 2px 0px 20px 0px;margin-top: -146px;margin-left: -250px;' id='insert'>
+    <div class="layui-layer-title">新增试卷</div>
+    <span class="layui-layer-setwin"><a class="layui-layer-ico layui-layer-close layui-layer-close1" href="javascript:;"
+                                        onclick='insToggle()'></a></span>
+    <div style='padding-right: 10px;padding-top: 10px'>
+        <div class='layui-form-item'>
+            <label class='layui-form-label'><span style='color:red'>*</span>试卷名</label>
+            <div class='layui-input-block'>
+                <input type='text' lay-verify='title' autocomplete='off' placeholder='不超过20位'
+                       class='layui-input' id='ins-name'>
+            </div>
+        </div>
+
+        <button type="button" class='layui-btn layui-btn-primary' style='float: right;' onclick='insToggle()'>取消</button>
+        <button type="button" class='layui-btn layui-btn-normal' style='float: right;margin-right: 10px' onclick='insPaper()'>保存
+        </button>
+    </div>
+</div>
+<!--修改试卷-->
+<div style='display:none;width:460px;height:163px;z-index:1000;position: fixed;top: 50%;left: 50%;background-color: #fff;
+    box-shadow: 2px 0px 20px 0px;margin-top: -146px;margin-left: -250px;' id='update'>
+    <div class="layui-layer-title">修改试卷</div>
+    <span class="layui-layer-setwin"><a class="layui-layer-ico layui-layer-close layui-layer-close1" href="javascript:;"
+                                        onclick='updToggle()'></a></span>
+    <div style='padding-right: 10px;padding-top: 10px'>
+        <div class='layui-form-item'>
+            <label class='layui-form-label'><span style='color:red'>*</span>试卷名</label>
+            <div class='layui-input-block'>
+                <input type='text' lay-verify='title' autocomplete='off' placeholder='不超过20位'
+                       class='layui-input' id='upd-name'>
+            </div>
+        </div>
+
+        <input type="hidden" id="id"/>
+        <button type="button" class='layui-btn layui-btn-primary' style='float: right;' onclick='updToggle()'>取消</button>
+        <button type="button" class='layui-btn layui-btn-normal' style='float: right;margin-right: 10px' onclick='updPaper()'>保存
+        </button>
+    </div>
+</div>
+<div class="layui-layer-shade" id="layui-layer-shade1" times="1" style="z-index: 999;display: none; background-color: rgb(0, 0, 0); opacity: 0.3;"></div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-xs " lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-xs " lay-event="look">查看试题</a>
+</script>
+<script>
+
+    function insToggle() {
+        $("#insert").fadeToggle("slow")
+        $("#layui-layer-shade1").fadeToggle()
+    }
+
+    function updToggle() {
+        $("#update").fadeToggle("slow")
+        $("#layui-layer-shade1").fadeToggle()
+    }
+    layui.use('table', function () {
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            , url: '../selPaper'
+            , title: '试卷表'
+            , cols: [[
+                {field: 'id', title: '序号', width: 100}
+                , {field: 'pname', title: '试卷名', width: 200}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ]]
+            ,page: true
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('您确定要删除该试卷信息吗？', function (index) {
+                    $.get('../delPaper', {'id': data.id}, function (result) {
+                        if (result > 0) {
+                            alert("删除成功！");
+                        }else{
+                            alert("删除失败！");
+                        }
+                        location.reload(true)
+                    })
+                });
+            }else if (obj.event === 'edit'){
+                $('#upd-name').val(data.pname)
+                $('#id').val(data.id)
+                updToggle()
+            }else if (obj.event === 'look'){
+                window.location.href='./question.html?pid='+data.id
+            }
+        });
+    });
+    //修改试卷信息
+    function updPaper() {
+        var name = $('#upd-name').val()
+        var id = $('#id').val()
+        if (name ==''){
+            alert('试卷名不能为空')
+        } else if (name.length > 20){
+            alert('试卷名不能大于20位')
+        }else{
+            $.get('../savePaper',{id:id,pname:name},function (result) {
+                if (result > 0) {
+                    alert('修改成功')
+                }else {
+                    alert('修改失败')
+                }
+                location.reload(true)
+            })
+        }
+    }
+
+    //新增试卷
+    function insPaper() {
+        var name = $('#ins-name').val()
+        if (name ==''){
+            alert('试卷名不能为空')
+        } else if (name.length > 20){
+            alert('试卷名不能大于20位')
+        } else {
+            $.get('../savePaper',{pname:name},function (result) {
+                if (result > 0) {
+                    alert('新增成功')
+                }else {
+                    alert('新增失败')
+                }
+                location.reload(true)
+            })
+        }
+    }
+</script>
+</body>
+</html>

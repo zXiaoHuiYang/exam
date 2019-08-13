@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>历史试卷管理</title>
+    <script src="../layui/layui.js"></script>
+    <script src="../js/jquery.js"></script>
+    <link rel="stylesheet" href="../layui/css/layui.css" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <script>
+        $(function () {
+            $.get('../adminInfo',function(data){
+                if(data == '0'){
+                    alert("请先登录！")
+                    top.location.href='./login.html'
+                }
+            },"json")
+        })
+    </script>
+</head>
+<body>
+<div style="margin-right: 15px">
+    <!-- 内容主体区域 -->
+    <div>
+        当前位置：
+        <span class="layui-breadcrumb" lay-separator=" > " style="visibility: visible;">
+            <a href="shouye.html">首页 > </a>
+            <a><cite>历史试卷管理</cite></a>
+        </span>
+    </div>
+    <div>
+        <div style="clear:both;">
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+        </div>
+    </div>
+
+</div>
+
+<div class="layui-layer-shade" id="layui-layer-shade1" times="1" style="z-index: 999;display: none; background-color: rgb(0, 0, 0); opacity: 0.3;"></div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-xs" lay-event="look">查看</a>
+</script>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            , url: '../selSpaper'
+            , title: '试卷表'
+            , cols: [[
+                {field: 'id', title: '序号', width: 100}
+                , {field: 'papername', title: '试卷名', width: 200}
+                , {field: 'username', title: '答题者', width: 200}
+                , {field: 'time', title: '做题时间', width: 200}
+                , {field: 'num', title: '分数', width: 200}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ]]
+            ,page: true
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('您确定要删除该试卷信息吗？', function (index) {
+                    $.get('../delSpaper', {'id': data.id}, function (result) {
+                        if (result > 0) {
+                            alert("删除成功！");
+                        }else{
+                            alert("删除失败！");
+                        }
+                        location.reload(true)
+                    })
+                });
+            }else if(obj.event === 'look'){
+                window.location.href='squestion.html?pid='+data.id
+            }
+        });
+    });
+</script>
+</body>
+</html>

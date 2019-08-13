@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.springframework.org/schema/jdbc">
+<head>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>在线考试</title>
+<link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/iconfont.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/test.css}" rel="stylesheet" type="text/css" />
+	<script th:src="@{/js/jquery-1.11.3.min.js}"></script>
+	<script>
+		$.get('./info',function(data){
+			if(data == '0'){
+				alert("请先登录！")
+				window.location.href='./login.html'
+			}
+		},"json")
+	</script>
+<style>
+.hasBeenAnswer {
+	background: #5d9cec;
+	color:#fff;
+}
+
+</style>
+</head>
+
+<body>
+	<div class="main">
+		<!--nr start-->
+		<div class="test_main">
+			<div class="nr_left">
+				<div class="test">
+					<div>
+						<div class="test_title">
+							<span><button onclick="submit()" style="border: none;padding: 0 18px;height: 40px;line-height: 40px;
+    															background: #389fc3; color: #fff;border-radius: 5px;margin-top: 3px;">交卷</button></span>
+						</div>
+
+							<div class="test_content">
+								<div class="test_content_title">
+									<h2>单选题</h2>
+									<p>
+										<span>共</span><i class="content_lit"  th:text="${qcount}"></i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${qcount*2}"></i><span>分</span>
+									</p>
+								</div>
+							</div>
+							<div class="test_content_nr">
+								<ul>
+
+									<div th:each="question,questionStat:${questions}">
+										<li th:id="${'qu_0_'+questionStat.index}">
+											<div class="test_content_nr_tt">
+												<i th:text="${questionStat.count}"></i><span>(2分)</span><span th:text="${question.content}"></span>
+											</div>
+
+											<div class="test_content_nr_main">
+												<ul>
+
+													<li class="option">
+
+														<input type="radio" class="radioOrCheck" th:name="answer+${questionStat.count}"
+															   th:id="${'0_answer_'+questionStat.count+'_option_1'}"
+														       value="A"/>
+
+
+														<label th:for="${'0_answer_'+questionStat.count+'_option_1'}">
+															A.
+															<p class="ue" style="display: inline;" th:text="${question.sa}"></p>
+														</label>
+													</li>
+
+													<li class="option">
+
+														<input type="radio" class="radioOrCheck" th:name="answer+${questionStat.count}"
+															   th:id="${'0_answer_'+questionStat.count+'_option_2'}"
+															   value="B"/>
+
+
+														<label th:for="${'0_answer_'+questionStat.count+'_option_2'}">
+															B.
+															<p class="ue" style="display: inline;" th:text="${question.sb}"></p>
+														</label>
+													</li>
+
+													<li class="option">
+
+														<input type="radio" class="radioOrCheck" th:name="answer+${questionStat.count}"
+															   th:id="${'0_answer_'+questionStat.count+'_option_3'}"
+															   value="C"/>
+
+
+														<label th:for="${'0_answer_'+questionStat.count+'_option_3'}">
+															C.
+															<p class="ue" style="display: inline;" th:text="${question.sc}"></p>
+														</label>
+													</li>
+
+													<li class="option">
+
+														<input type="radio" class="radioOrCheck" th:name="answer+${questionStat.count}"
+															   th:id="${'0_answer_'+questionStat.count+'_option_4'}"
+															   value="D"/>
+
+
+														<label th:for="${'0_answer_'+questionStat.count+'_option_4'}">
+															D.
+															<p class="ue" style="display: inline;" th:text="${question.sd}"></p>
+														</label>
+													</li>
+
+												</ul>
+											</div>
+										</li>
+									</div>
+
+								</ul>
+							</div>
+
+					</div>
+				</div>
+
+			</div>
+			<div class="nr_right">
+				<div class="nr_rt_main">
+					<div class="rt_nr1">
+						<div class="rt_nr1_title">
+							<h1>
+								答题卡
+							</h1>
+							<p class="test_time">
+								<b class="alt-1">01:00</b>
+							</p>
+						</div>
+
+							<div class="rt_content">
+								<div class="rt_content_tt">
+									<h2>单选题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${qcount}"></i><span>题</span>
+									</p>
+								</div>
+								<div class="rt_content_nr answerSheet">
+									<ul>
+										<span th:each="count,countStat:${questions}">
+											<li><a th:href="@{'#qu_0_'+${countStat.index}}" th:text="${countStat.count}"></a></li>
+										</span>
+									</ul>
+								</div>
+							</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<!--nr end-->
+		<div class="foot"></div>
+	</div>
+
+
+	<script th:src="@{/js/jquery.easy-pie-chart.js}"></script>
+	<!--时间js-->
+	<script th:src="@{/js/jquery.countdown.js}"></script>
+	<script th:inline="javascript">
+		$(function() {
+			$('li.option label').click(function() {
+			debugger;
+				var examId = $(this).closest('.test_content_nr_main').closest('li').attr('id'); // 得到题目ID
+				var cardLi = $('a[href=#' + examId + ']'); // 根据题目ID找到对应答题卡
+				// 设置已答题
+				if(!cardLi.hasClass('hasBeenAnswer')){
+					cardLi.addClass('hasBeenAnswer');
+				}
+
+			});
+			$('.alt-1').countDown().on('time.elapsed',function() {
+				alert("ee");
+			});
+		});
+
+		/*<![CDATA[*/
+		function submit() {
+			var questions = [[${questions}]];
+			var num = 0;
+			var notdo = 0;
+			// console.log(count)
+			for (var i = 0; i < questions.length ; i++) {
+				doAnswer = $("input[name=answer" + (i+1) + "]:checked").val();
+				if (questions[i].answer == doAnswer){
+					num  += 2;
+				}
+				if (typeof(doAnswer) == "undefined"){
+					notdo += 1;
+					doAnswer=''
+				}
+				questions[i]['doanswer'] = doAnswer
+				delete questions[i].id
+				delete questions[i].pid
+			}
+			if (notdo == 0){
+				 toPost(questions,num)
+				//alert('可以提交')
+			} else {
+				if (confirm("你还有"+notdo+"道题还没做，你确定交卷吗？")) {
+					toPost(questions,num)
+				}
+			}
+			// console.log(questions)
+		}
+		/*]]>*/
+		function toPost(questions,num) {
+			$.post('insSpaper',{num:num,pid:getUrlParam('pid')},function (result) {
+				if (result > 0){
+					for (var i = 0; i < questions.length ; i++) {
+						questions[i]['spid'] = result
+					}
+					// console.log(questions)
+					var q = JSON.stringify(questions)
+					$.ajax({
+						type:"post",
+						url:'insSquestion',
+						data:{questions:q},
+						success:function (res) {
+							if (res > 0){
+								alert("提交成功,共答对"+(num/2)+"题，得"+num+"分,详情请看答题历史！")
+								window.location.href="index"
+							}
+						}
+					})
+
+				}
+			})
+		}
+		//获取地址栏属性
+		function getUrlParam(name) {
+			var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+			var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+			if (r!=null) return unescape(r[2]); return null; //返回参数值
+		}
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.springframework.org/schema/jdbc">
+<head>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>在线考试</title>
+<link th:href="@{/css/main.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/iconfont.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/css/test.css}" rel="stylesheet" type="text/css" />
+	<script th:src="@{/js/jquery-1.11.3.min.js}"></script>
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+	<script th:src="@{/layui/layui.js}"></script>
+	<script>
+		$.get('./info',function(data){
+			if(data == '0'){
+				alert("请先登录！")
+				window.location.href='./login.html'
+			}
+		},"json")
+	</script>
+<style>
+.hasBeenAnswer {
+	background: #5d9cec;
+	color: #fff;
+}
+.judge{
+	width: 200px;
+	height: 200px;
+	right: 68px;
+	top: 20px;
+	position: absolute;
+	z-index: 99;
+}
+
+</style>
+</head>
+
+<body>
+	<div class="main">
+		<!--nr start-->
+		<div class="test_main">
+			<div class="nr_left">
+				<div class="test">
+					<div>
+							<div class="test_content">
+								<div class="test_content_title">
+									<h2>单选题</h2>
+									<p>
+										<span>共</span><i class="content_lit"  th:text="${sqcount}"></i><span>题，</span><span>合计</span><i class="content_fs"  th:text="${sqcount*2}"></i><span>分</span>
+									</p>
+								</div>
+							</div>
+							<div class="test_content_nr">
+								<ul>
+
+									<div th:each="question,questionStat:${squestions}" style="position: relative">
+										<li th:id="${'qu_0_'+questionStat.index}">
+											<div class="test_content_nr_tt">
+												<i th:text="${questionStat.count}"></i><span>(2分)</span><span th:text="${question.content}"></span>
+											</div>
+
+											<div class="test_content_nr_main">
+												<ul>
+													<li class="option">
+														A.
+														<p class="ue" style="display: inline;" th:text="${question.sa}"></p>
+													</li>
+
+													<li class="option">
+														B.
+														<p class="ue" style="display: inline;" th:text="${question.sb}"></p>
+													</li>
+
+													<li class="option">
+														C.
+														<p class="ue" style="display: inline;" th:text="${question.sc}"></p>
+													</li>
+
+													<li class="option">
+														D.
+														<p class="ue" style="display: inline;" th:text="${question.sd}"></p>
+													</li>
+
+													<table class="layui-table" lay-size="lg">
+														<colgroup>
+															<col width="200">
+															<col>
+														</colgroup>
+														<thead>
+														<tr>
+															<th colspan="2" style="border-top:0px;" th:if="${question.answer} eq ${question.doanswer}">本题得分：2分</th>
+															<th colspan="2" style="border-top:0px;" th:if="${question.answer} ne ${question.doanswer}">本题得分：0分</th>
+														</tr>
+														</thead>
+														<tbody>
+														<tr>
+															<td>正确答案：</td>
+															<td th:text="${question.answer}"></td>
+														</tr>
+														<tr>
+															<td>您的答案：</td>
+															<td th:text="${question.doanswer}"></td>
+														</tr>
+														<tr>
+															<td>答案解析：</td>
+															<td>无</td>
+														</tr>
+														</tbody>
+													</table>
+												</ul>
+											</div>
+										</li>
+										<div th:if="${question.answer} eq ${question.doanswer}" th:style="'background-image: url('+@{images/right.png}+')'" class="judge"></div>
+										<div th:if="${question.answer} ne ${question.doanswer}" th:style="'background-image: url('+@{images/wrong.png}+')'" class="judge"></div>
+									</div>
+
+								</ul>
+							</div>
+
+					</div>
+				</div>
+
+			</div>
+			<div class="nr_right">
+				<div class="nr_rt_main">
+					<div class="rt_nr1">
+						<div class="rt_nr1_title">
+							<h1>
+								答题卡
+							</h1>
+						</div>
+
+							<div class="rt_content">
+								<div class="rt_content_tt">
+									<h2>单选题</h2>
+									<p>
+										<span>共</span><i class="content_lit" th:text="${sqcount}"></i><span>题</span>
+									</p>
+								</div>
+								<div class="rt_content_nr answerSheet">
+									<ul>
+										<span th:each="count,countStat:${squestions}">
+											<li><a th:href="@{'#qu_0_'+${countStat.index}}" th:text="${countStat.count}"></a></li>
+										</span>
+									</ul>
+								</div>
+							</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<!--nr end-->
+		<div class="foot"></div>
+	</div>
+
+
+	<script th:src="@{/js/jquery.easy-pie-chart.js}"></script>
+	<script th:inline="javascript">
+		$(function() {
+			$('li.option label').click(function() {
+			debugger;
+				var examId = $(this).closest('.test_content_nr_main').closest('li').attr('id'); // 得到题目ID
+				var cardLi = $('a[href=#' + examId + ']'); // 根据题目ID找到对应答题卡
+				// 设置已答题
+				if(!cardLi.hasClass('hasBeenAnswer')){
+					cardLi.addClass('hasBeenAnswer');
+				}
+
+			});
+		});
+	</script>
+</body>
+
+</html>

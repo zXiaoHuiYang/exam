@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>试题管理</title>
+    <script src="../layui/layui.js"></script>
+    <script src="../js/jquery.js"></script>
+    <link rel="stylesheet" href="../layui/css/layui.css" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <script>
+        $(function () {
+            $.get('../adminInfo',function(data){
+                if(data == '0'){
+                    alert("请先登录！")
+                    top.location.href='./login.html'
+                }
+            },"json")
+        })
+    </script>
+</head>
+<body>
+<div style="margin-right: 15px">
+    <!-- 内容主体区域 -->
+    <div>
+        当前位置：
+        <span class="layui-breadcrumb" lay-separator=" > " style="visibility: visible;">
+            <a href="shouye.html">首页 > </a>
+            <a href="paper.html">试卷管理 > </a>
+            <a><cite>试题管理</cite></a>
+        </span>
+    </div>
+    <div>
+        <div style="float: right;margin-bottom: 10px">
+            <button class="layui-btn layui-btn-warm" onclick='insToggle()'>新增</button>
+        </div>
+        <div style="clear:both;">
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+        </div>
+    </div>
+
+</div>
+<!--新增试题-->
+<div style='display:none;width:626px;height:317px;z-index:1000;position: fixed;top: 50%;left: 50%;background-color: #fff;
+    box-shadow: 2px 0px 20px 0px;margin-top: -183px;margin-left: -321px;' id='insert'>
+    <div class="layui-layer-title">新增试题</div>
+    <span class="layui-layer-setwin"><a class="layui-layer-ico layui-layer-close layui-layer-close1" href="javascript:;"
+                                        onclick='insToggle()'></a></span>
+    <div style='padding-right: 10px;padding-top: 10px'>
+        <div class='layui-form-item'>
+            <label class='layui-form-label'><span style='color:red'>*</span>试题名</label>
+            <div class='layui-input-block'>
+                <input type='text' lay-verify='title' autocomplete='off' placeholder='不超过20位'
+                       class='layui-input' id='ins-content'>
+            </div>
+        </div>
+
+        <div class='layui-form-item'>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>A选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='ins-sa'>
+            </div>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>B选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='ins-sb'>
+            </div>
+        </div>
+
+        <div class='layui-form-item'>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>C选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='ins-sc'>
+            </div>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>D选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='ins-sd'>
+            </div>
+        </div>
+
+        <div class='layui-form-item'>
+            <label class='layui-form-label'><span style='color:red'>*</span>答案</label>
+            <div class='layui-input-block'>
+                <input type='text' lay-verify='title' autocomplete='off' placeholder='不超过20位'
+                       class='layui-input' id='ins-answer'>
+            </div>
+        </div>
+        <button type="button" class='layui-btn layui-btn-primary' style='float: right;' onclick='insToggle()'>取消</button>
+        <button type="button" class='layui-btn layui-btn-normal' style='float: right;margin-right: 10px' onclick='insQuestion()'>保存
+        </button>
+    </div>
+</div>
+<!--修改试题-->
+<div style='display:none;width:626px;height:317px;z-index:1000;position: fixed;top: 50%;left: 50%;background-color: #fff;
+    box-shadow: 2px 0px 20px 0px;margin-top: -183px;margin-left: -321px;' id='update'>
+    <div class="layui-layer-title">修改试题</div>
+    <span class="layui-layer-setwin"><a class="layui-layer-ico layui-layer-close layui-layer-close1" href="javascript:;"
+                                        onclick='updToggle()'></a></span>
+    <div style='padding-right: 10px;padding-top: 10px'>
+        <div class='layui-form-item'>
+            <label class='layui-form-label'><span style='color:red'>*</span>试题名</label>
+            <div class='layui-input-block'>
+                <input type='text' lay-verify='title' autocomplete='off' placeholder='不超过20位'
+                       class='layui-input' id='upd-content'>
+            </div>
+        </div>
+        <div class='layui-form-item'>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>A选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='upd-sa'>
+            </div>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>B选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='upd-sb'>
+            </div>
+        </div>
+
+        <div class='layui-form-item'>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>C选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='upd-sc'>
+            </div>
+            <label class='layui-form-label' style='padding: 9px 9px;width: 90px;'><span style='color:red'>*</span>D选项</label>
+            <div class='layui-input-inline'>
+                <input type='text' name='title' lay-verify='title' autocomplete='off' placeholder='不超过30个字' class='layui-input' id='upd-sd'>
+            </div>
+        </div>
+
+        <div class='layui-form-item'>
+            <label class='layui-form-label'><span style='color:red'>*</span>答案</label>
+            <div class='layui-input-block'>
+                <input type='text' lay-verify='title' autocomplete='off' placeholder='不超过20位'
+                       class='layui-input' id='upd-answer'>
+            </div>
+        </div>
+
+        <input type="hidden" id="id"/>
+        <button type="button" class='layui-btn layui-btn-primary' style='float: right;' onclick='updToggle()'>取消</button>
+        <button type="button" class='layui-btn layui-btn-normal' style='float: right;margin-right: 10px' onclick='updQuestion()'>保存
+        </button>
+    </div>
+</div>
+<div class="layui-layer-shade" id="layui-layer-shade1" times="1" style="z-index: 999;display: none; background-color: rgb(0, 0, 0); opacity: 0.3;"></div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-xs " lay-event="edit">修改</a>
+</script>
+<script>
+
+    function insToggle() {
+        $("#insert").fadeToggle("slow")
+        $("#layui-layer-shade1").fadeToggle()
+    }
+
+    function updToggle() {
+        $("#update").fadeToggle("slow")
+        $("#layui-layer-shade1").fadeToggle()
+    }
+    layui.use('table', function () {
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            , url: '../selQuestion'
+            , where: {
+                pid:getUrlParam("pid")
+            }
+            , title: '试题表'
+            , cols: [[
+                {field: 'id', title: '序号', width: 80}
+                , {field: 'content', title: '题干', width: 150}
+                , {field: 'sa', title: 'A选项', width: 150}
+                , {field: 'sb', title: 'B选项', width: 150}
+                , {field: 'sc', title: 'C选项', width: 150}
+                , {field: 'sd', title: 'D选项', width: 150}
+                , {field: 'answer', title: '答案', width: 80}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ]]
+            ,page: true
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('您确定要删除该试题信息吗？', function (index) {
+                    $.get('../delQuestion', {'id': data.id}, function (result) {
+                        if (result > 0) {
+                            alert("删除成功！");
+                        }else{
+                            alert("删除失败！");
+                        }
+                        location.reload(true)
+                    })
+                });
+            }else if (obj.event === 'edit'){
+                $('#upd-content').val(data.content)
+                $('#upd-sa').val(data.sa)
+                $('#upd-sb').val(data.sb)
+                $('#upd-sc').val(data.sc)
+                $('#upd-sd').val(data.sd)
+                $('#upd-answer').val(data.answer)
+                $('#id').val(data.id)
+                updToggle()
+            }
+        });
+    });
+    //修改试题信息
+    function updQuestion() {
+        var content = $('#upd-content').val()
+        var sa = $('#upd-sa').val()
+        var sb = $('#upd-sb').val()
+        var sc = $('#upd-sc').val()
+        var sd = $('#upd-sd').val()
+        var answer = $('#upd-answer').val()
+        var id = $('#id').val()
+        var pid = getUrlParam('pid')
+        if (name ==''){
+            alert('试题名不能为空')
+        } else if (name.length > 20){
+            alert('试题名不能大于20位')
+        } else if (sa ==''){
+            alert('选项A不能为空')
+        }else if (sb ==''){
+            alert('选项B不能为空')
+        }else if (sc ==''){
+            alert('选项C不能为空')
+        }else if (sd ==''){
+            alert('选项D不能为空')
+        } else if (sa.length > 200 || sb.length > 200 || sc.length > 200 || sd.length > 200){
+            alert('选项不能大于200位')
+        }else if (pid ==''){
+            alert('查询失败')
+        } else{
+            $.get('../saveQuestion',{id:id,content:content,sa:sa,sb:sb,sc:sc,sd:sd,answer:answer,pid:pid},function (result) {
+                if (result > 0) {
+                    alert('修改成功')
+                }else {
+                    alert('修改失败')
+                }
+                location.reload(true)
+            })
+        }
+    }
+
+    //新增试题
+    function insQuestion() {
+        var content = $('#ins-content').val()
+        var sa = $('#ins-sa').val()
+        var sb = $('#ins-sb').val()
+        var sc = $('#ins-sc').val()
+        var sd = $('#ins-sd').val()
+        var answer = $('#ins-answer').val()
+        var pid = getUrlParam('pid')
+        if (name ==''){
+            alert('试题名不能为空')
+        } else if (name.length > 20){
+            alert('试题名不能大于20位')
+        } else if (sa ==''){
+            alert('选项A不能为空')
+        }else if (sb ==''){
+            alert('选项B不能为空')
+        }else if (sc ==''){
+            alert('选项C不能为空')
+        }else if (sd ==''){
+            alert('选项D不能为空')
+        } else if (sa.length > 200 || sb.length > 200 || sc.length > 200 || sd.length > 200){
+            alert('选项不能大于200位')
+        } else if (pid ==''){
+            alert('查询失败')
+        } else {
+            $.get('../saveQuestion',{content:content,sa:sa,sb:sb,sc:sc,sd:sd,answer:answer,pid:pid},function (result) {
+                if (result > 0) {
+                    alert('新增成功')
+                }else {
+                    alert('新增失败')
+                }
+                location.reload(true)
+            })
+        }
+    }
+
+    //获取地址栏属性
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r!=null) return unescape(r[2]); return null; //返回参数值
+    }
+</script>
+</body>
+</html>

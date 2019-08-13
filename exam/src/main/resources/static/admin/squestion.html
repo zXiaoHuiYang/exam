@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>做题记录管理</title>
+    <script src="../layui/layui.js"></script>
+    <script src="../js/jquery.js"></script>
+    <link rel="stylesheet" href="../layui/css/layui.css" media="all">
+    <style type="text/css">
+        html,body{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+    <script>
+        $(function () {
+            $.get('../adminInfo',function(data){
+                if(data == '0'){
+                    alert("请先登录！")
+                    top.location.href='./login.html'
+                }
+            },"json")
+        })
+    </script>
+</head>
+<body>
+<div style="margin-right: 15px">
+    <!-- 内容主体区域 -->
+    <div>
+        当前位置：
+        <span class="layui-breadcrumb" lay-separator=" > " style="visibility: visible;">
+            <a href="shouye.html">首页 > </a>
+            <a href="spaper.html">历史试卷管理 > </a>
+            <a><cite>做题记录管理</cite></a>
+        </span>
+    </div>
+    <div>
+        <div style="clear:both;">
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+        </div>
+    </div>
+
+</div>
+
+<div class="layui-layer-shade" id="layui-layer-shade1" times="1" style="z-index: 999;display: none; background-color: rgb(0, 0, 0); opacity: 0.3;"></div>
+<script>
+
+    layui.use('table', function () {
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            , url: '../selSquestionPage'
+            , where: {
+                pid:getUrlParam("pid")
+            }
+            , title: '试题表'
+            , cols: [[
+                {field: 'id', title: '序号', width: 80}
+                , {field: 'content', title: '题干', width: 200}
+                , {field: 'answer', title: '正确答案', width: 150}
+                , {field: 'doanswer', title: '答题者答案'}
+            ]]
+            ,page: true
+        });
+    });
+
+    //获取地址栏属性
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r!=null) return unescape(r[2]); return null; //返回参数值
+    }
+</script>
+</body>
+</html>

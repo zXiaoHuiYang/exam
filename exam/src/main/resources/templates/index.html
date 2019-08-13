@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.springframework.org/schema/jdbc">
+<head>
+    <meta charset="UTF-8">
+    <title>在线答题系统</title>
+    <link rel="stylesheet" th:href="@{layui/css/layui.css}"  media="all">
+    <script th:src="@{layui/layui.js}" charset="utf-8"></script>
+    <script th:src="@{js/jquery.js}"></script>
+    <script>
+        $(function () {
+            checkUser()
+        })
+        function checkUser() {
+            $.get('./info',function(data){
+                if(data == '0'){
+                    alert("请先登录！")
+                    window.location.href='./login.html'
+                }else{
+                    $('#navname').text(data.name)
+                }
+            },"json")
+        }
+    </script>
+</head>
+<body>
+<div class="layui-row">
+    <div class="layui-col-xs4 layui-col-md2">
+        <div class="grid-demo">
+            <div class="layui-card" style=" font-family: cursive;">
+                <div class="layui-card-header" style="font-size: 28px;">在线答题</div>
+                <div class="layui-card-body">
+                    <p>您好！<span id="navname"></span>，欢迎来到在线答题</p>
+                    <p>加油！</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs14 layui-col-md10">
+        <div class="grid-demo grid-demo-bg1">
+            <div class="layui-tab layui-tab-card">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">试卷</li>
+                    <li onclick="checkUser()">答题历史</li>
+                </ul>
+                <div class="layui-tab-content" style="min-height: 490px;">
+                    <div class="layui-tab-item layui-show">
+                        <div style="clear:both;">
+                            <table class="layui-hide" id="test" lay-filter="test"></table>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div style="clear:both;">
+                            <table class="layui-hide" id="test2" lay-filter="test2"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs " lay-event="exam">开始做题</a>
+    </script>
+    <script type="text/html" id="barDemo2">
+        <a class="layui-btn layui-btn-xs " lay-event="look">查看</a>
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+    </script>
+</div>
+<script type="text/javascript" th:inline="none">
+    layui.use('element', function(){
+        var $ = layui.jquery
+            ,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+    });
+    layui.use('table', function () {
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            , url: './selPaper'
+            , title: '试卷表'
+            , cols: [[  {field: 'id', title: '序号', width: 100}
+                , {field: 'pname', title: '试卷名', width: 200}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            if(obj.event === 'exam'){
+                window.location.href='exam?pid='+data.id
+            }
+        });
+
+        table.render({
+            elem: '#test2'
+            , url: './selSpaperByUserid'
+            , title: '历史试卷表'
+            , cols: [[  {field: 'id', title: '序号', width: 100}
+                , {field: 'papername', title: '试卷名', width: 200}
+                , {field: 'time', title: '做题时间', width: 200}
+                , {field: 'num', title: '分数', width: 200}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo2'}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(test2)', function (obj) {
+            var data = obj.data;
+            if(obj.event === 'look'){
+                window.location.href='historyExam?pid='+data.id
+            }else if (obj.event === 'del'){
+                layer.confirm('您确定要删除该做题记录吗？', function (index) {
+                    $.get('delSpaper', {id: data.id}, function (result) {
+                        if (result > 0) {
+                            alert('删除成功！')
+                        } else {
+                            alert('删除失败！')
+                        }
+                        location.reload(true)
+                    })
+                })
+            }
+        });
+    });
+</script>
+</body>
+</html>

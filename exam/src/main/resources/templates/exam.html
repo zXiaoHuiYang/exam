@@ -130,7 +130,7 @@
 								答题卡
 							</h1>
 							<p class="test_time">
-								<b class="alt-1">01:00</b>
+								<b class="alt-1">00:01</b>
 							</p>
 						</div>
 
@@ -163,6 +163,7 @@
 	<!--时间js-->
 	<script th:src="@{/js/jquery.countdown.js}"></script>
 	<script th:inline="javascript">
+        var timedao = 0;
 		$(function() {
 			$('li.option label').click(function() {
 			debugger;
@@ -175,7 +176,8 @@
 
 			});
 			$('.alt-1').countDown().on('time.elapsed',function() {
-				alert("ee");
+                timedao = 1
+                submit()
 			});
 		});
 
@@ -198,10 +200,12 @@
 				delete questions[i].id
 				delete questions[i].pid
 			}
-			if (notdo == 0){
-				 toPost(questions,num)
-				//alert('可以提交')
-			} else {
+			if ( timedao == 1){   //检查考试时间是否到了
+                alert("考试时间到了！！！")
+                toPost(questions,num)
+			}else if(notdo == 0){  //没做的题目是否==0
+                toPost(questions,num)
+            } else {
 				if (confirm("你还有"+notdo+"道题还没做，你确定交卷吗？")) {
 					toPost(questions,num)
 				}

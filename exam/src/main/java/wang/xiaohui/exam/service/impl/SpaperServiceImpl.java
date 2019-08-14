@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import wang.xiaohui.exam.dao.PaperDao;
@@ -62,7 +63,9 @@ public class SpaperServiceImpl implements SpaperService {
 
     @Override
     public Map<String, Object> selSpaperByUserid(int page, int size, int userid) {
-        Pageable pageable = PageRequest.of(page-1,size);
+        //排序等定义
+        Sort sort = new Sort(Sort.Direction.DESC,"time");
+        Pageable pageable = PageRequest.of(page-1,size,sort);
         Specification spec = new Specification() {
             @Override
             public Predicate toPredicate(Root root, CriteriaQuery criteriaQuery, CriteriaBuilder cb) {
